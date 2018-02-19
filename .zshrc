@@ -67,3 +67,6 @@ alias micro="TERM=xterm-256color micro"
 
 # dotfile management alias
 alias dotfiles='/usr/bin/git --git-dir=$HOME/.dotfiles.git/ --work-tree=$HOME'
+
+# misc
+alias ll="ls -la"
