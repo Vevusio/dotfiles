@@ -5,32 +5,6 @@ source /usr/share/zsh/scripts/zplug/init.zsh
 # Make sure to use double quotes
 zplug "zsh-users/zsh-history-substring-search"
 
-# Disable updates using the "frozen" tag
-zplug "k4rthik/git-cal", as:command, frozen:1
-
-# Grab binaries from GitHub Releases
-# and rename with the "rename-to:" tag
-zplug "junegunn/fzf-bin", \
-    from:gh-r, \
-    as:command, \
-    rename-to:fzf, \
-    use:"*darwin*amd64*"
-
-# Supports oh-my-zsh plugins and the like
-zplug "plugins/git",   from:oh-my-zsh
-
-# Run a command after a plugin is installed/updated
-# Provided, it requires to set the variable like the following:
-# ZPLUG_SUDO_PASSWORD="********"
-zplug "jhawthorn/fzy", \
-    as:command, \
-    rename-to:fzy, \
-    hook-build:"make && sudo make install"
-
-# Supports checking out a specific branch/tag/commit
-zplug "b4b4r07/enhancd", at:v1
-zplug "mollifier/anyframe", at:4c23cb60
-
 # Pure theme
 zplug mafredri/zsh-async, from:github
 zplug sindresorhus/pure, use:pure.zsh, from:github, as:theme
@@ -68,6 +42,6 @@ alias micro="TERM=xterm-256color micro"
 # dotfile management alias
 alias dotfiles='/usr/bin/git --git-dir=$HOME/.dotfiles.git/ --work-tree=$HOME'
 
-# misc
-alias ls="ls --color"
-alias ll="ls -la"
+# masquerade exa as ll
+alias ls="exa"
+alias ll="exa -la"
