@@ -6,9 +6,20 @@ source /usr/share/zsh/scripts/zplug/init.zsh
 zplug "zsh-users/zsh-history-substring-search"
 
 # Pure theme
-zplug mafredri/zsh-async, from:github
-zplug sindresorhus/pure, use:pure.zsh, from:github, as:theme
+#zplug mafredri/zsh-async, from:github
+#zplug sindresorhus/pure, use:pure.zsh, from:github, as:theme
 # END Pure theme
+
+# powerlevel9k
+#POWERLEVEL9K_MODE='awesome-patched'
+zplug "bhilburn/powerlevel9k", use:powerlevel9k.zsh-theme, as:theme
+
+POWERLEVEL9K_CUSTOM_PROMPT="echo λ"
+
+POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(vcs dir rbenv newline custom_prompt)
+POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(root_indicator command_execution_time background_jobs time)
+
+# /powerlevel9k
 
 # Set the priority when loading
 # e.g., zsh-syntax-highlighting must be loaded
