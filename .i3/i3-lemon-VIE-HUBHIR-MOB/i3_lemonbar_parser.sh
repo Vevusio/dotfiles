@@ -106,23 +106,23 @@ while read -r line ; do
 
 				## Set Colors
 				if [ ${tmb_arr_perc} -le ${bat_alert_low} ]; then
-					bat_cicon=${color_icon}; bat_cfore=${color_fore}; bat_cback=${color_bat_low};
+					bat_cicon=${color_icon}
 				elif [ ${tmb_arr_perc} -le ${bat_alert_mid} ]; then
-					bat_cicon=${color_icon}; bat_cfore=${color_fore}; bat_cback=${color_bat_mid};
+					bat_cicon=${color_icon}
 				elif [ ${tmb_arr_perc} -le ${bat_alert_high} ]; then
-					bat_cicon=${color_bat_high}; bat_cfore=${color_fore}; bat_cback=${color_sec_b1};
+					bat_cicon=${color_bat_high}
 				else
-					bat_cicon=${color_icon}; bat_cfore=${color_fore}; bat_cback=${color_sec_b1};
+					bat_cicon=${color_icon}
 				fi
 
 				## Set charging icon
 				if [ "${tmb_arr_stat}" == "C" ]; then
 					bat_icon=${icon_bat_plug}; bat_cicon=${color_bat_plug};
 				fi
-				bat="%{F${bat_cback}}${sep_left}%{F${bat_cicon} B${bat_cback}}%{T2}${bat_icon}%{F- T1} ${tmb_arr_perc}%"
+				bat="%{F${bat_cicon} B- T2}${bat_icon}%{F- T1} ${tmb_arr_perc}%"
 				
 				if [ "${tmb_arr_time}" != "none" ]; then
-					bat_time="%{F${color_icon}}${sep_l_left}%{F${color_icon} B${color_sec_b1}} %{T2}${icon_bat_time}%{F- T1} ${tmb_arr_time}"
+					bat_time="%{F- B- T1} (${tmb_arr_time})"
 				  else
 					bat_time=""
 				fi
@@ -200,10 +200,11 @@ while read -r line ; do
         printf "%s" "${mast_net}${stab}"
     fi
     if [ ! -z "${bat}" ]; then
-        printf "%s" "${bat}${stab}"
-    fi
-    if [ ! -z "${bat_time}" ]; then
-        printf "%s" "${bat_time}${stab}"
+        printf "%s" "${bat}"
+        if [ ! -z "${bat_time}" ]; then
+            printf "%s" "${bat_time}"
+        fi
+        printf "%s" "${stab}"
     fi
     if [ ! -z "${cpu}" ]; then
         printf "%s" "${cpu}${stab}"
