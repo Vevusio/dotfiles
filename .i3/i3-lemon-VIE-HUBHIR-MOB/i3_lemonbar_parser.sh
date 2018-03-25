@@ -193,47 +193,62 @@ while read -r line ; do
 	# segment between the three background colors, you have to manually
 	# find the CASE and edit.
 
-	printf "%s" "%{l}${wsp}${title} "
+    BAR_TEXT=''
+	BAR_TEXT+=$(printf "%s" "%{l}${wsp}${title} ")
 
-	printf "%s" "%{r}"
+	BAR_TEXT+=$(printf "%s" "%{r}")
     if [ ! -z "${mast_net}" ]; then
-        printf "%s" "${mast_net}${stab}"
+        BAR_TEXT+=$(printf "%s" "${mast_net}${stab}")
     fi
     if [ ! -z "${bat}" ]; then
-        printf "%s" "${bat}"
+        BAR_TEXT+=$(printf "%s" "${bat}")
         if [ ! -z "${bat_time}" ]; then
-            printf "%s" "${bat_time}"
+            BAR_TEXT+=$(printf "%s" "${bat_time}")
         fi
-        printf "%s" "${stab}"
+        BAR_TEXT+=$(printf "%s" "${stab}")
     fi
     if [ ! -z "${cpu}" ]; then
-        printf "%s" "${cpu}${stab}"
+        BAR_TEXT+=$(printf "%s" "${cpu}${stab}")
     fi
     if [ ! -z "${mem}" ]; then
-        printf "%s" "${mem}${stab}"
+        BAR_TEXT+=$(printf "%s" "${mem}${stab}")
     fi
     if [ ! -z "${diskr}" ]; then
-        printf "%s" "${diskr}${stab}"
+        BAR_TEXT+=$(printf "%s" "${diskr}${stab}")
     fi
     if [ ! -z "${nets_d}" ]; then
-        printf "%s" "${nets_d}${stab}"
+        BAR_TEXT+=$(printf "%s" "${nets_d}${stab}")
     fi
     if [ ! -z "${nets_u}" ]; then
-        printf "%s" "${nets_u}${stab}"
+        BAR_TEXT+=$(printf "%s" "${nets_u}${stab}")
     fi
     if [ ! -z "${vol}" ]; then
-        printf "%s" "${vol}${stab}"
+        BAR_TEXT+=$(printf "%s" "${vol}${stab}")
     fi
     if [ ! -z "${bri}" ]; then
-        printf "%s" "${bri}${stab}"
+        BAR_TEXT+=$(printf "%s" "${bri}${stab}")
     fi
     if [ ! -z "${date}" ]; then
-        printf "%s" "${date}${stab}"
+        BAR_TEXT+=$(printf "%s" "${date}${stab}")
     fi
     if [ ! -z "${time}" ]; then
-        printf "%s" "${time}"
+        BAR_TEXT+=$(printf "%s" "${time}")
     fi
 
+    # print bar on all monitors
+    NUM_OF_MONITORS=$(xrandr | grep ' connected' | wc -l)
+    for (( i=0; i<NUM_OF_MONITORS; i++ ))
+    do
+        printf "%s" "%{S${i}}${BAR_TEXT}"
+    done
     printf "\n"
 
 done
+
+
+
+
+
+
+
+
