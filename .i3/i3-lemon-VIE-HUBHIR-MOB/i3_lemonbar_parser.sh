@@ -138,12 +138,17 @@ while read -r line ; do
 			wsp="%{F- B- O19 T2}${icon_wsp}%{T1 O19}"
 			set -- ${line#???}
 			while [ $# -gt 0 ] ; do
-				case $1 in
-				 FOC*)
-					wsp="${wsp}%{F- B${color_workspace_selected_bg} T1}%{+u}  ${1#???}  %{-u}%{B-}"
+			    eval $(echo "$1" | awk -F ":::" '{print \
+                        "WSP_MONITOR="$1, \
+                        "WSP_STATUS="$2, \
+                        "WSP_NAME="$3 \
+			        }')
+				case ${WSP_STATUS} in
+				 FOC)
+					wsp="${wsp}%{F- B${color_workspace_selected_bg} T1}%{+u}  ${WSP_NAME}  %{-u}%{B-}"
 					;;
-				 INA*|URG*|ACT*)
-					wsp="${wsp}%{F- B- T1}  ${1#???}  "
+				 INA|URG|ACT)
+					wsp="${wsp}%{F- B- T1}  ${WSP_NAME}  "
 					;;
 				esac
 				shift

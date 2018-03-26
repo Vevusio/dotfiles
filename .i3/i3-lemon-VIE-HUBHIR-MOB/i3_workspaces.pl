@@ -122,7 +122,9 @@ sub update_output {
             $state = "URG" if $ws->{urgent};
             $state = "FOC" if $ws->{focused};
             my $name = $ws->{name};
-            $out .= qq|$state$name |;
+            my $output = $ws->{output};
+            my $separator = ":::";
+            $out .= qq|$output$separator$state$separator$name |;
         }
 
         $out .= "\n";
