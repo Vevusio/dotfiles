@@ -15,6 +15,18 @@ title="%{F${color_head} B${color_sec_b2}}${sep_right}%{F${color_head} B${color_s
 ## parser
 while read -r line ; do
 	case $line in
+	    ### monitors ### {{{
+	    MON*)
+	        monitor_list=(${line#???})
+	        declare -A monitor_map
+	        monitor_index=0
+	        for output in ${monitor_list}; do
+	            monitor_map[${output},'index']=${monitor_index}
+	            monitor_map[${output},'output']=${output}
+	            monitor_map[${output},'workspaces']="%{F- B- O19 T2}${icon_wsp}%{T1 O19}"
+            done
+	        ;;
+        ### end monitors case
 		### SYS Case ### {{{
 		SYS*)
 			## conky=, 0=day, 1=month, 2=time, 3=cpu, 4=mem, 5=disk
@@ -135,6 +147,7 @@ while read -r line ; do
 		### Workspace Case ### {{{
 		WSP*)
 			## I3 Workspaces
+			declare -A workspace_map
 			wsp="%{F- B- O19 T2}${icon_wsp}%{T1 O19}"
 			set -- ${line#???}
 			while [ $# -gt 0 ] ; do
@@ -143,6 +156,9 @@ while read -r line ; do
                         "WSP_STATUS="$2, \
                         "WSP_NAME="$3 \
 			        }')
+                workspace_map[${WSP_NAME},'name']=${WSP_NAME}
+                workspace_map[${WSP_NAME},'output']=${WSP_MONITOR}
+                workspace_map[${WSP_NAME},'status']=${WSP_STATUS}
 				case ${WSP_STATUS} in
 				 FOC)
 					wsp="${wsp}%{F- B${color_workspace_selected_bg} T1}%{+u}  ${WSP_NAME}  %{-u}%{B-}"
@@ -199,6 +215,35 @@ while read -r line ; do
 	# find the CASE and edit.
 
     BAR_TEXT=''
+
+    ## build the workspaces string for every monitor
+    for workspace_key in ${!workspace_map[@]}; do
+        workspace_name=${workspace_map[${workspace_key},'name']}
+        workspace_output=${workspace_map[${workspace_key},'output']}
+        workspace_status=${workspace_map[${workspace_key},'status']}
+
+        if [ ${monitor_map[${workspace_output},'output']} ]; then
+            wsp=${monitor_map[${workspace_output},'workspaces']}
+            case ${workspace_status} in
+             FOC)
+                wsp="${wsp}%{F- B${color_workspace_selected_bg} T1}%{+u}  ${workspace_name}  %{-u}%{B-}"
+                ;;
+             INA|URG|ACT)
+                wsp="${wsp}%{F- B- T1}  ${workspace_name}  "
+                ;;
+            esac
+            monitor_map[${workspace_output},'workspaces']="${wsp}"
+        else
+            printf "%s" "!WARN:no_monitor${workspace_output}!"
+        fi
+    done
+
+#    for monitor_key in ${!monitor_map[@]}; do
+#        monitor_output=${monitor_map[${monitor_key},'output']}
+#        monitor_output=${monitor_map[${monitor_key},'index']}
+#        monitor_output=${monitor_map[${monitor_key},'workspaces']}
+#
+#    done
 	BAR_TEXT+=$(printf "%s" "%{l}${wsp}${title} ")
 
 	BAR_TEXT+=$(printf "%s" "%{r}")
@@ -237,14 +282,14 @@ while read -r line ; do
         BAR_TEXT+=$(printf "%s" "${date}${stab}")
     fi
     if [ ! -z "${time}" ]; then
-        BAR_TEXT+=$(printf "%s" "${time}")
+        BAR_TEXT+=$(printf "%s" "${time}")A
     fi
 
     # print bar on all monitors
     NUM_OF_MONITORS=$(xrandr | grep ' connected' | wc -l)
     for (( i=0; i<NUM_OF_MONITORS; i++ ))
     do
-        printf "%s" "%{S${i}}${BAR_TEXT}"
+        printf "%s" "%{S${i}}${BAR_TEXT} dplay $i]"
     done
     printf "\n"
 
