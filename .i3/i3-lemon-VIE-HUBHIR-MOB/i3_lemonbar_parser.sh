@@ -17,13 +17,15 @@ while read -r line ; do
 	case $line in
 	    ### monitors ### {{{
 	    MON*)
-	        monitor_list=(${line#???})
+	        unset monitor_map
 	        declare -A monitor_map
+
+	        monitor_keys=(${line#???})
+
 	        monitor_index=0
-	        for output in ${monitor_list}; do
+	        for output in ${monitor_keys}; do
 	            monitor_map[${output},'index']=${monitor_index}
 	            monitor_map[${output},'output']=${output}
-	            monitor_map[${output},'workspaces']="%{F- B- O19 T2}${icon_wsp}%{T1 O19}"
             done
 	        ;;
         ### end monitors case
@@ -148,17 +150,19 @@ while read -r line ; do
 		WSP*)
 			## I3 Workspaces
 			declare -A workspace_map
-			wsp="%{F- B- O19 T2}${icon_wsp}%{T1 O19}"
+
+            for k in ${monitor_keys}; do
+                monitor_map[${k},'workspaces']="%{F- B- O19 T2}${icon_wsp}%{T1 O19}"
+            done
+
 			set -- ${line#???}
 			while [ $# -gt 0 ] ; do
 			    eval $(echo "$1" | awk -F ":::" '{print \
-                        "WSP_MONITOR="$1, \
+                        "WSP_OUTPUT="$1, \
                         "WSP_STATUS="$2, \
                         "WSP_NAME="$3 \
 			        }')
-                workspace_map[${WSP_NAME},'name']=${WSP_NAME}
-                workspace_map[${WSP_NAME},'output']=${WSP_MONITOR}
-                workspace_map[${WSP_NAME},'status']=${WSP_STATUS}
+                wsp="${monitor_map[${WSP_OUTPUT},'workspaces']}"
 				case ${WSP_STATUS} in
 				 FOC)
 					wsp="${wsp}%{F- B${color_workspace_selected_bg} T1}%{+u}  ${WSP_NAME}  %{-u}%{B-}"
@@ -167,9 +171,9 @@ while read -r line ; do
 					wsp="${wsp}%{F- B- T1}  ${WSP_NAME}  "
 					;;
 				esac
+                monitor_map[${WSP_OUTPUT},'workspaces']="${wsp}"
 				shift
 			done
-			wsp="${wsp}%{O19}"
 			;;
 		### End Workspace Case ### }}}
 
@@ -214,83 +218,54 @@ while read -r line ; do
 	# segment between the three background colors, you have to manually
 	# find the CASE and edit.
 
-    BAR_TEXT=''
+    for k in ${monitor_keys}; do
+        BAR_TEXT=''
 
-    ## build the workspaces string for every monitor
-    for workspace_key in ${!workspace_map[@]}; do
-        workspace_name=${workspace_map[${workspace_key},'name']}
-        workspace_output=${workspace_map[${workspace_key},'output']}
-        workspace_status=${workspace_map[${workspace_key},'status']}
+        wsp="${monitor_map[${k},'workspaces']}"
+        BAR_TEXT+=$(printf "%s" "%{l}${wsp}%{O19}${title} ")
 
-        if [ ${monitor_map[${workspace_output},'output']} ]; then
-            wsp=${monitor_map[${workspace_output},'workspaces']}
-            case ${workspace_status} in
-             FOC)
-                wsp="${wsp}%{F- B${color_workspace_selected_bg} T1}%{+u}  ${workspace_name}  %{-u}%{B-}"
-                ;;
-             INA|URG|ACT)
-                wsp="${wsp}%{F- B- T1}  ${workspace_name}  "
-                ;;
-            esac
-            monitor_map[${workspace_output},'workspaces']="${wsp}"
-        else
-            printf "%s" "!WARN:no_monitor${workspace_output}!"
+        BAR_TEXT+=$(printf "%s" "%{r}")
+        if [ ! -z "${mast_net}" ]; then
+            BAR_TEXT+=$(printf "%s" "${mast_net}${stab}")
         fi
+        if [ ! -z "${bat}" ]; then
+            BAR_TEXT+=$(printf "%s" "${bat}")
+            if [ ! -z "${bat_time}" ]; then
+                BAR_TEXT+=$(printf "%s" "${bat_time}")
+            fi
+            BAR_TEXT+=$(printf "%s" "${stab}")
+        fi
+        if [ ! -z "${cpu}" ]; then
+            BAR_TEXT+=$(printf "%s" "${cpu}${stab}")
+        fi
+        if [ ! -z "${mem}" ]; then
+            BAR_TEXT+=$(printf "%s" "${mem}${stab}")
+        fi
+        if [ ! -z "${diskr}" ]; then
+            BAR_TEXT+=$(printf "%s" "${diskr}${stab}")
+        fi
+        if [ ! -z "${nets_d}" ]; then
+            BAR_TEXT+=$(printf "%s" "${nets_d}${stab}")
+        fi
+        if [ ! -z "${nets_u}" ]; then
+            BAR_TEXT+=$(printf "%s" "${nets_u}${stab}")
+        fi
+        if [ ! -z "${vol}" ]; then
+            BAR_TEXT+=$(printf "%s" "${vol}${stab}")
+        fi
+        if [ ! -z "${bri}" ]; then
+            BAR_TEXT+=$(printf "%s" "${bri}${stab}")
+        fi
+        if [ ! -z "${date}" ]; then
+            BAR_TEXT+=$(printf "%s" "${date}${stab}")
+        fi
+        if [ ! -z "${time}" ]; then
+            BAR_TEXT+=$(printf "%s" "${time}")
+        fi
+
+        printf "%s" "%{S${monitor_map[${k},'index']}}${BAR_TEXT} dplay $k"
     done
 
-#    for monitor_key in ${!monitor_map[@]}; do
-#        monitor_output=${monitor_map[${monitor_key},'output']}
-#        monitor_output=${monitor_map[${monitor_key},'index']}
-#        monitor_output=${monitor_map[${monitor_key},'workspaces']}
-#
-#    done
-	BAR_TEXT+=$(printf "%s" "%{l}${wsp}${title} ")
-
-	BAR_TEXT+=$(printf "%s" "%{r}")
-    if [ ! -z "${mast_net}" ]; then
-        BAR_TEXT+=$(printf "%s" "${mast_net}${stab}")
-    fi
-    if [ ! -z "${bat}" ]; then
-        BAR_TEXT+=$(printf "%s" "${bat}")
-        if [ ! -z "${bat_time}" ]; then
-            BAR_TEXT+=$(printf "%s" "${bat_time}")
-        fi
-        BAR_TEXT+=$(printf "%s" "${stab}")
-    fi
-    if [ ! -z "${cpu}" ]; then
-        BAR_TEXT+=$(printf "%s" "${cpu}${stab}")
-    fi
-    if [ ! -z "${mem}" ]; then
-        BAR_TEXT+=$(printf "%s" "${mem}${stab}")
-    fi
-    if [ ! -z "${diskr}" ]; then
-        BAR_TEXT+=$(printf "%s" "${diskr}${stab}")
-    fi
-    if [ ! -z "${nets_d}" ]; then
-        BAR_TEXT+=$(printf "%s" "${nets_d}${stab}")
-    fi
-    if [ ! -z "${nets_u}" ]; then
-        BAR_TEXT+=$(printf "%s" "${nets_u}${stab}")
-    fi
-    if [ ! -z "${vol}" ]; then
-        BAR_TEXT+=$(printf "%s" "${vol}${stab}")
-    fi
-    if [ ! -z "${bri}" ]; then
-        BAR_TEXT+=$(printf "%s" "${bri}${stab}")
-    fi
-    if [ ! -z "${date}" ]; then
-        BAR_TEXT+=$(printf "%s" "${date}${stab}")
-    fi
-    if [ ! -z "${time}" ]; then
-        BAR_TEXT+=$(printf "%s" "${time}")A
-    fi
-
-    # print bar on all monitors
-    NUM_OF_MONITORS=$(xrandr | grep ' connected' | wc -l)
-    for (( i=0; i<NUM_OF_MONITORS; i++ ))
-    do
-        printf "%s" "%{S${i}}${BAR_TEXT} dplay $i]"
-    done
     printf "\n"
 
 done
