@@ -42,6 +42,7 @@ color_underline="#FF76b9ed"
 color_back="#FF000000"               ## Default background
 color_fore="#FFFFFFFF"               ## Default foreground
 color_workspace_selected_bg="#FF474B4F"
+color_workspace_active_bg="#FF272727"
 
 color_head="#FF000000"              ## Background for first element
 color_sec_b1="#FF282A2E"            ## Background for section 1

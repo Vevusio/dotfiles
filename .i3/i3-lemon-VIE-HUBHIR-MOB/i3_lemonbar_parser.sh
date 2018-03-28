@@ -23,9 +23,10 @@ while read -r line ; do
 	        monitor_keys=(${line#???})
 
 	        monitor_index=0
-	        for output in ${monitor_keys}; do
+	        for output in "${monitor_keys[@]}"; do
 	            monitor_map[${output},'index']=${monitor_index}
 	            monitor_map[${output},'output']=${output}
+	            let monitor_index++
             done
 	        ;;
         ### end monitors case
@@ -151,7 +152,7 @@ while read -r line ; do
 			## I3 Workspaces
 			declare -A workspace_map
 
-            for k in ${monitor_keys}; do
+            for k in "${monitor_keys[@]}"; do
                 monitor_map[${k},'workspaces']="%{F- B- O19 T2}${icon_wsp}%{T1 O19}"
             done
 
@@ -167,7 +168,10 @@ while read -r line ; do
 				 FOC)
 					wsp="${wsp}%{F- B${color_workspace_selected_bg} T1}%{+u}  ${WSP_NAME}  %{-u}%{B-}"
 					;;
-				 INA|URG|ACT)
+				 ACT)
+					wsp="${wsp}%{F- B${color_workspace_active_bg} T1}  ${WSP_NAME}  %{B-}"
+					;;
+				 INA|URG)
 					wsp="${wsp}%{F- B- T1}  ${WSP_NAME}  "
 					;;
 				esac
@@ -218,7 +222,7 @@ while read -r line ; do
 	# segment between the three background colors, you have to manually
 	# find the CASE and edit.
 
-    for k in ${monitor_keys}; do
+    for k in "${monitor_keys[@]}"; do
         BAR_TEXT=''
 
         wsp="${monitor_map[${k},'workspaces']}"
@@ -263,7 +267,7 @@ while read -r line ; do
             BAR_TEXT+=$(printf "%s" "${time}")
         fi
 
-        printf "%s" "%{S${monitor_map[${k},'index']}}${BAR_TEXT} dplay $k"
+        printf "%s" "%{S${monitor_map[${k},'index']}}${BAR_TEXT}"
     done
 
     printf "\n"

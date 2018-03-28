@@ -26,7 +26,7 @@ monitors=$(xrandr \
     | sort -t '=' -k 1 -n \
     | awk -F '=' '{print $2}' \
     | paste -sd " ")
-echo "MON${monitors}" > "${panel_fifo}" &
+printf "MON%s\n" "${monitors}" > "${panel_fifo}" &
 
 ## Window title, "WIN"
 xprop -spy -root _NET_ACTIVE_WINDOW | sed -un 's/.*\(0x.*\)/WIN\1/p' > "${panel_fifo}" &
