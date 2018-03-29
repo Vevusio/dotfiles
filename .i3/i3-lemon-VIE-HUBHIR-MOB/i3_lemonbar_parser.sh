@@ -11,7 +11,6 @@
 ## min init
 irc_n_high=0
 title="%{F${color_head} B${color_sec_b2}}${sep_right}%{F${color_head} B${color_sec_b2}%{T2} ${icon_prog} %{F${color_sec_b2} B-}${sep_right}%{F- B- T1}"
-monitors_initialized=0
 
 ## parser
 while read -r line ; do
@@ -30,7 +29,6 @@ while read -r line ; do
 	            let monitor_index++
             done
 
-            monitors_initialized=1
 	        ;;
         ### end monitors case
 		### SYS Case ### {{{
@@ -153,34 +151,32 @@ while read -r line ; do
 		### Workspace Case ### {{{
 		WSP*)
 			## I3 Workspaces
-			if [ ${monitors_initialized} -eq 1 ]; then
-                for k in "${monitor_keys[@]}"; do
-                    monitor_map[${k},'workspaces']="%{F- B- O19 T2}${icon_wsp}%{T1 O19}"
-                done
+            for k in "${monitor_keys[@]}"; do
+                monitor_map[${k},'workspaces']="%{F- B- O19 T2}${icon_wsp}%{T1 O19}"
+            done
 
-                set -- ${line#???}
-                while [ $# -gt 0 ] ; do
-                    eval $(echo "$1" | awk -F ":::" '{print \
-                            "WSP_OUTPUT="$1, \
-                            "WSP_STATUS="$2, \
-                            "WSP_NAME="$3 \
-                        }')
-                    wsp="${monitor_map[${WSP_OUTPUT},'workspaces']}"
-                    case ${WSP_STATUS} in
-                     FOC)
-                        wsp="${wsp}%{F- B${color_workspace_selected_bg} T1}%{+u}  ${WSP_NAME}  %{-u}%{B-}"
-                        ;;
-                     ACT)
-                        wsp="${wsp}%{F- B${color_workspace_active_bg} T1}  ${WSP_NAME}  %{B-}"
-                        ;;
-                     INA|URG)
-                        wsp="${wsp}%{F- B- T1}  ${WSP_NAME}  "
-                        ;;
-                    esac
-                    monitor_map[${WSP_OUTPUT},'workspaces']="${wsp}"
-                    shift
-                done
-            fi
+            set -- ${line#???}
+            while [ $# -gt 0 ] ; do
+                eval $(echo "$1" | awk -F ":::" '{print \
+                        "WSP_OUTPUT="$1, \
+                        "WSP_STATUS="$2, \
+                        "WSP_NAME="$3 \
+                    }')
+                wsp="${monitor_map[${WSP_OUTPUT},'workspaces']}"
+                case ${WSP_STATUS} in
+                 FOC)
+                    wsp="${wsp}%{F- B${color_workspace_selected_bg} T1}%{+u}  ${WSP_NAME}  %{-u}%{B-}"
+                    ;;
+                 ACT)
+                    wsp="${wsp}%{F- B${color_workspace_active_bg} T1}  ${WSP_NAME}  %{B-}"
+                    ;;
+                 INA|URG)
+                    wsp="${wsp}%{F- B- T1}  ${WSP_NAME}  "
+                    ;;
+                esac
+                monitor_map[${WSP_OUTPUT},'workspaces']="${wsp}"
+                shift
+            done
 			;;
 		### End Workspace Case ### }}}
 
@@ -224,8 +220,6 @@ while read -r line ; do
 	## NOTE: At this moment, there is not a dead simple way to adjust a
 	# segment between the three background colors, you have to manually
 	# find the CASE and edit.
-
-    printf "%s\n" "${momo}"
 
     for k in "${monitor_keys[@]}"; do
         BAR_TEXT=''
