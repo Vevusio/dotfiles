@@ -18,11 +18,12 @@ trap 'trap - TERM; kill 0' INT TERM QUIT EXIT
 mkfifo "${panel_fifo}"
 
 ### monitors
-### connected, formatted as {left-x-coord}={output-name}, sorted by x-coord, output-names joined as whitespace csv
+### connected and active, will contain string like " connected 1920x..."
+### formatted as {left-x-coord}={output-name}, sorted by x-coord, output-names joined as whitespace csv
 ### in the end monitors is contains output-names separated by whitespaces, in the order that lemonbar understands
 ### i.e. output index 0 = lemonbar %{S0}, output index 1 = %{S1}, etc.
 monitors=$(xrandr \
-    | awk '/ connected/ {print gensub(/^[^\+]+\+([0-9]+)\+.*$/, "\\1", "g", $3)"="$1}' \
+    | awk '/[0-9]+x[0-9]+\+[0-9]+\+[0-9]+/ {resolutionAndPosition=($3!="primary") ? $3 : $4; print gensub(/^[^\+]+\+([0-9]+)\+.*$/, "\\1", "g", resolutionAndPosition)"="$1}' \
     | sort -t '=' -k 1 -n \
     | awk -F '=' '{print $2}' \
     | paste -sd " ")
