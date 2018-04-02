@@ -53,6 +53,9 @@ alias micro="TERM=xterm-256color micro"
 # dotfile management alias
 alias dotfiles='/usr/bin/git --git-dir=$HOME/.dotfiles.git/ --work-tree=$HOME'
 
+# psc
+source /psc/scripts/.zsh
+
 # masquerade exa as ll
 alias ls="exa"
 alias ll="exa -la"
