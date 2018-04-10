@@ -47,6 +47,11 @@ SAVEHIST=1000
 bindkey -e
 # End of lines configured by zsh-newuser-install
 
+# ssh agent socket
+# see ~/.config/systemd/user/ssh-agent.service
+# see https://stackoverflow.com/questions/18880024/start-ssh-agent-on-login
+export SSH_AUTH_SOCK="$XDG_RUNTIME_DIR/ssh-agent.socket"
+
 # alias micro so it can start with correct terminal mode
 alias micro="TERM=xterm-256color micro"
 
