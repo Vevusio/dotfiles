@@ -49,7 +49,7 @@ bindkey -e
 
 # ssh agent socket
 # see ~/.config/systemd/user/ssh-agent.service
-# see https://stackoverflow.com/questions/18880024/start-ssh-agent-on-login
+# see https://stackoverflow.com/a/38980986
 export SSH_AUTH_SOCK="$XDG_RUNTIME_DIR/ssh-agent.socket"
 
 # alias micro so it can start with correct terminal mode
