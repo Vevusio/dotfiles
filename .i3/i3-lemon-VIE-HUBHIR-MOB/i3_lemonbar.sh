@@ -90,7 +90,7 @@ while :; do
 		if [ "${BAT0}" != "" ] || [ "${BAT1}" != "" ]; then
 			## Originally "/sys/class/power_supply/BAT{0..1}/uevent" but changed into variables make work for non thinkpad cases. paste fails if it can't find a passed file.
 			## "U" for unknown
-			printf "%s%s %s\n" "TMB" "$(paste -d = ${BAT0} ${BAT1} 2>/dev/null | awk 'BEGIN {CHARGE="U"} /ENERGY_FULL=/||/ENERGY_NOW=/||/STATUS=/||/CHARGE_NOW=/||/CHARGE_FULL=/ {split($0,a,"="); if(a[2]~/Discharging/||a[4]~/Discharging/){CHARGE="D"} else if(a[2]~/Charging/||a[4]~/Charging/){CHARGE="C"} else if (a[2]~/Full/||a[4]~/Full/){CHARGE="F"}; if(a[1]~/FULL/){FULL=a[2]+a[4]}; if(a[1]~/NOW/){NOW=a[2]+a[4]};} END {if(NOW!=""){PERC=int((NOW/FULL)*100)} else {PERC="none"}; printf("%s %s\n", PERC, CHARGE)}')" "$(acpi -b | awk '/[0-9][0-9]:[0-9][0-9]:[0-9][0-9] (until|remaining)/ {if($5!=""){TIME=$5}i} END {if(TIME!=""){print TIME} else {print "none"}}')" > "${panel_fifo}" 
+			printf "%s%s %s\n" "TMB" "$(paste -d = ${BAT0} ${BAT1} 2>/dev/null | awk 'BEGIN {CHARGE="U"} /ENERGY_FULL=/||/ENERGY_NOW=/||/STATUS=/||/CHARGE_NOW=/||/CHARGE_FULL=/ {split($0,a,"="); if(a[2]~/Discharging/||a[4]~/Discharging/){CHARGE="D"} else if(a[2]~/Charging/||a[4]~/Charging/){CHARGE="C"} else if (a[2]~/Full/||a[4]~/Full/){CHARGE="F"}; if(a[1]~/FULL/){FULL=a[2]+a[4]}; if(a[1]~/NOW/){NOW=a[2]+a[4]};} END {if(NOW!=""){PERC=int((NOW/FULL)*100)} else {PERC="none"}; printf("%s %s\n", PERC, CHARGE)}')" "$(acpi -b | awk '/[0-9][0-9]:[0-9][0-9]:[0-9][0-9] (until|remaining)/ {if($5!=""){TIME=$5}i} END {if(TIME!=""){print TIME} else {print "none"}}')" > "${panel_fifo}"
 			else
 			printf "%s%s\n" "TMB" "none" > "${panel_fifo}"
 		fi
@@ -104,9 +104,13 @@ done &
 
 #### LOOP FIFO
 
-cat "${panel_fifo}" \
+#cat "${panel_fifo}" \
+#    | $(dirname $0)/i3_lemonbar_parser.sh \
+#	| lemonbar -b -p -f "${font}" -f "${iconfont}" -g "${geometry}" -B "${color_back}" -F "${color_fore}" -U "${color_underline}" -u "${pixels_underline}" &
+
+cat $(dirname $0)/'conkyprint.txt' \
     | $(dirname $0)/i3_lemonbar_parser.sh \
-	| lemonbar -b -p -f "${font}" -f "${iconfont}" -g "${geometry}" -B "${color_back}" -F "${color_fore}" -U "${color_underline}" -u "${pixels_underline}" &
+    | lemonbar -b -p -f "${font}" -f "${iconfont}" -g "${geometry}" -B "${color_back}" -F "${color_fore}" -U "${color_underline}" -u "${pixels_underline}" &
 
 wait
 
